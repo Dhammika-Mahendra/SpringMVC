@@ -22,7 +22,7 @@
     </bean>
 
     <!-- Static resource handling -->
-    <mvc:resources mapping="/resources/**" location="WEB-INF" />
+    <mvc:resources mapping="/resources/**" location="/WEB-INF/resources/"/>
 
     <!-- Enable annotation-driven request mapping -->
     <mvc:annotation-driven />
