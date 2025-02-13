@@ -13,6 +13,7 @@
 
     <!-- Enable component scanning -->
     <context:component-scan base-package="com.example.controller" />
+    <context:component-scan base-package="com.example.util" />
 
     <!-- View resolver -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">

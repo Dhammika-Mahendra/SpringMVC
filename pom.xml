@@ -33,8 +33,14 @@
 
     <!-- installed .jar -->
     <!-- mvn install:install-file -Dfile=src/main/resources/lib/ojdbc11.jar -DgroupId=com.oracle.database.jdbc -DartifactId=ojdbc11 -Dversion=21.9.0 -Dpackaging=jar -->
+    <dependency>
+      <groupId>com.oracle.database.jdbc</groupId>
+      <artifactId>ojdbc11</artifactId>
+      <version>21.9.0</version>
+      <scope>compile</scope>
+    </dependency>
 
-    <!-- JSTL for tables -->
+    <!-- JSTL for tagging -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
