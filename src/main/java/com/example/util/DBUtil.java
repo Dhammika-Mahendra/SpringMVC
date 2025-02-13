@@ -17,16 +17,16 @@ import java.util.Set;
 public class DBUtil {
 
     @Value("${database.url}")
-    private static String URL;
+    private String URL;
 
     @Value("${database.user}")
-    private static String USERNAME;
+    private String USERNAME;
 
     @Value("${database.password}")
-    private static String PASSWORD;
+    private String PASSWORD;
 
     // Method to establish connection and query data
-    public static Set<Map<String, Object>> getEmployeeData() {
+    public Set<Map<String, Object>> getEmployeeData() {
         Set<Map<String, Object>> employeeData = new HashSet<>();
         Connection conn = null;
         Statement stmt = null;
