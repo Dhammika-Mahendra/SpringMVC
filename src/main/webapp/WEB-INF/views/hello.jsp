@@ -5,6 +5,8 @@
 <html>
 <head>
   <title>Hello Spring MVC</title>
+  <link href="<c:url value="/resources/css/hello.css" />" rel="stylesheet">
+
 </head>
 <body>
 <h1>${message}</h1>
