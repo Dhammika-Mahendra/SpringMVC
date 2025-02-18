@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.util.DBUtil;
+import com.example.util.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,15 @@ public class EmployeeController {
 
     @Autowired
     private DBUtil DBUtil;
+
+    @Autowired
+    private UserDao userDao;
+
+    @GetMapping("/dbcheck")
+    public String checkDatabaseConnection() {
+        userDao.testConnection();
+        return "hello";
+    }
 
     @GetMapping("/employees")
     public String getEmployeeData(Model model) {
