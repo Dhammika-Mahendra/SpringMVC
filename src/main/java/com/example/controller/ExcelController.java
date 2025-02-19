@@ -15,8 +15,8 @@ public class ExcelController {
 
     @GetMapping("/ex")
     @ResponseBody
-    public String readExcel() {
-        excelService.readExcelFile();
+    public String readExcel(@RequestParam (name="fileName") String fileName) {
+        excelService.readExcelFile(fileName);
         return "hello";
     }
 
@@ -24,9 +24,10 @@ public class ExcelController {
     @ResponseBody
     public String readSpecificCell(
             @RequestParam(name = "row", defaultValue = "0") int row,
-            @RequestParam(name = "col", defaultValue = "0") int col) {
+            @RequestParam(name = "col", defaultValue = "0") int col,
+            @RequestParam (name="fileName") String fileName) {
 
-        String cellValue = excelService.readCellByAddress(row, col);
+        String cellValue = excelService.readCellByAddress(fileName, row, col);
         System.out.println("Cell value: " + cellValue);
         return "hello";
     }
@@ -38,9 +39,10 @@ public class ExcelController {
             @RequestParam (name="inputColumn") String inputColumn,
             @RequestParam (name="inputValue") String inputValue,
             @RequestParam (name="outputColumn") String outputColumn,
-            @RequestParam (name="headInd") int headInd) {
+            @RequestParam (name="headInd") int headInd,
+            @RequestParam (name="fileName") String fileName) {
         System.out.println(inputColumn+ " " + inputValue + " " + outputColumn + " " + headInd);
-        String result = excelService.findValueByColumnMatch(inputColumn, headInd, inputValue, outputColumn);
+        String result = excelService.findValueByColumnMatch(fileName, inputColumn, headInd, inputValue, outputColumn);
         if (result != null) {
             System.out.println("Found " + outputColumn + ": " + result + " for " + inputColumn + ": " + inputValue);
             return "hello";

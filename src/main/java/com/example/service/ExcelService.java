@@ -11,110 +11,44 @@ import java.io.InputStream;
 @Service
 public class ExcelService {
 
-    public void readExcelFile() {
-        try {
-            // Load the file from resources directory
-            ClassPathResource resource = new ClassPathResource("Sample.xlsx");
-            InputStream inputStream = resource.getInputStream();
+    /**
+     * Reads the entire content of an Excel file and prints it to the console.
+     */
+    public void readExcelFile(String fileName) {
+        try (Workbook workbook = getWorkbook(fileName)) {
+            if (workbook == null) return;
 
-            // Create Workbook instance from input stream
-            Workbook workbook = new XSSFWorkbook(inputStream);
-
-            // Get first worksheet
             Sheet sheet = workbook.getSheetAt(0);
 
-            // Iterate through each row
             for (Row row : sheet) {
-                // Iterate through each cell in row
                 for (Cell cell : row) {
-                    // Print cell value based on cell type
-                    switch (cell.getCellType()) {
-                        case STRING:
-                            System.out.print(cell.getStringCellValue() + "\t");
-                            break;
-                        case NUMERIC:
-                            System.out.print(cell.getNumericCellValue() + "\t");
-                            break;
-                        case BOOLEAN:
-                            System.out.print(cell.getBooleanCellValue() + "\t");
-                            break;
-                        default:
-                            System.out.print("" + "\t");
-                    }
+                    System.out.print(getCellValueAsString(cell) + "\t");
                 }
-                System.out.println(); // New line after each row
+                System.out.println();
             }
-
-            // Close workbook and stream
-            workbook.close();
-            inputStream.close();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public String readCellByAddress(int rowIndex, int colIndex) {
+    /**
+     * Reads a specific cell from an Excel file.
+     */
+    public String readCellByAddress(String fileName, int rowIndex, int colIndex) {
         System.out.println("Reading cell at row " + rowIndex + ", column " + colIndex);
-        try {
-            // Load the file from resources directory
-            ClassPathResource resource = new ClassPathResource("HTOU.xlsx");
-            InputStream inputStream = resource.getInputStream();
+        try (Workbook workbook = getWorkbook(fileName)) {
+            if (workbook == null) return "Error: Unable to open workbook";
 
-            // Create Workbook instance from input stream
-            Workbook workbook = new XSSFWorkbook(inputStream);
-
-            // Get first worksheet
             Sheet sheet = workbook.getSheetAt(0);
-
-            // Get the specific row (null check in case row doesn't exist)
             Row row = sheet.getRow(rowIndex);
-            if (row == null) {
-                workbook.close();
-                inputStream.close();
-                System.out.println("Row " + rowIndex + " does not exist");
-                return "Row not found";
-            }
+            if (row == null) return "Row not found";
 
-            // Get the specific cell (null check in case cell doesn't exist)
             Cell cell = row.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-            if (cell == null) {
-                workbook.close();
-                inputStream.close();
-                System.out.println("Cell at row " + rowIndex + ", column " + colIndex + " does not exist");
-                return "Cell not found";
-            }
+            if (cell == null) return "Cell not found";
 
-            // Get cell value based on cell type
-            String result;
-            switch (cell.getCellType()) {
-                case STRING:
-                    result = cell.getStringCellValue();
-                    break;
-                case NUMERIC:
-                    if (DateUtil.isCellDateFormatted(cell)) {
-                        result = cell.getDateCellValue().toString();
-                    } else {
-                        result = String.valueOf(cell.getNumericCellValue());
-                    }
-                    break;
-                case BOOLEAN:
-                    result = String.valueOf(cell.getBooleanCellValue());
-                    break;
-                case FORMULA:
-                    result = "Formula: " + cell.getCellFormula();
-                    break;
-                default:
-                    result = "Empty or unsupported cell type";
-            }
-
-            // Print to console
+            String result = getCellValueAsString(cell);
             System.out.println("Value at row " + rowIndex + ", column " + colIndex + ": " + result);
-
-            // Close resources
-            workbook.close();
-            inputStream.close();
-
             return result;
 
         } catch (IOException e) {
@@ -123,28 +57,18 @@ public class ExcelService {
         }
     }
 
-    public String findValueByColumnMatch(String inputColumnName,int HeadInd, String inputValue, String outputColumnName) {
-        try {
-            // Load the file from resources directory
-            ClassPathResource resource = new ClassPathResource("BH.xlsx");
-            InputStream inputStream = resource.getInputStream();
+    /**
+     * Finds a value by matching a column and retrieving another column's value.
+     */
+    public String findValueByColumnMatch(String fileName, String inputColumnName, int headerRowIndex,
+                                         String inputValue, String outputColumnName) {
+        try (Workbook workbook = getWorkbook(fileName)) {
+            if (workbook == null) return null;
 
-            // Create Workbook instance from input stream
-            Workbook workbook = new XSSFWorkbook(inputStream);
-
-            // Get first worksheet
             Sheet sheet = workbook.getSheetAt(0);
+            Row headerRow = sheet.getRow(headerRowIndex);
+            if (headerRow == null) return null;
 
-            // Get header row (assuming it's the first row - index 0)
-            Row headerRow = sheet.getRow(HeadInd);
-            if (headerRow == null) {
-                System.out.println("Header row not found");
-                workbook.close();
-                inputStream.close();
-                return null;
-            }
-
-            // Find column indices for inputColumnName and outputColumnName
             int inputColumnIndex = -1;
             int outputColumnIndex = -1;
 
@@ -152,66 +76,24 @@ public class ExcelService {
                 Cell cell = headerRow.getCell(i);
                 if (cell != null) {
                     String headerValue = cell.getStringCellValue();
-                    if (headerValue.equalsIgnoreCase(inputColumnName)) {
-                        inputColumnIndex = i;
-                    }
-                    if (headerValue.equalsIgnoreCase(outputColumnName)) {
-                        outputColumnIndex = i;
-                    }
+                    if (headerValue.equalsIgnoreCase(inputColumnName)) inputColumnIndex = i;
+                    if (headerValue.equalsIgnoreCase(outputColumnName)) outputColumnIndex = i;
                 }
             }
 
-            // Check if both columns were found
-            if (inputColumnIndex == -1) {
-                System.out.println("Input column '" + inputColumnName + "' not found");
-                workbook.close();
-                inputStream.close();
-                return null;
-            }
+            if (inputColumnIndex == -1 || outputColumnIndex == -1) return null;
 
-            if (outputColumnIndex == -1) {
-                System.out.println("Output column '" + outputColumnName + "' not found");
-                workbook.close();
-                inputStream.close();
-                return null;
-            }
-
-            // Search through data rows (starting from row 1, after header)
-            for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+            for (int rowIndex = headerRowIndex + 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
                 Row dataRow = sheet.getRow(rowIndex);
-                if (dataRow != null) {
-                    Cell inputCell = dataRow.getCell(inputColumnIndex);
-                    if (inputCell != null) {
-                        // Convert cell value to string for comparison
-                        String cellValue = getCellValueAsString(inputCell);
+                if (dataRow == null) continue;
 
-                        // Check if this is the row we're looking for
-                        if (cellValue.equals(inputValue)) {
-                            // Found matching row, get output value
-                            Cell outputCell = dataRow.getCell(outputColumnIndex);
-                            if (outputCell != null) {
-                                String result = getCellValueAsString(outputCell);
-                                System.out.println("Found " + outputColumnName + ": " + result +
-                                        " for " + inputColumnName + ": " + inputValue);
-                                workbook.close();
-                                inputStream.close();
-                                return result;
-                            } else {
-                                System.out.println("Output cell is empty for " + inputColumnName +
-                                        ": " + inputValue);
-                                workbook.close();
-                                inputStream.close();
-                                return null;
-                            }
-                        }
-                    }
+                Cell inputCell = dataRow.getCell(inputColumnIndex);
+                if (inputCell != null && getCellValueAsString(inputCell).equals(inputValue)) {
+                    Cell outputCell = dataRow.getCell(outputColumnIndex);
+                    return outputCell != null ? getCellValueAsString(outputCell) : null;
                 }
             }
 
-            // If we get here, no matching row was found
-            System.out.println("No match found for " + inputColumnName + ": " + inputValue);
-            workbook.close();
-            inputStream.close();
             return null;
 
         } catch (IOException e) {
@@ -221,29 +103,40 @@ public class ExcelService {
     }
 
     /**
-     * Helper method to convert any cell type to String
+     * Helper method to load a workbook from a file.
+     */
+    private Workbook getWorkbook(String fileName) {
+        try {
+            ClassPathResource resource = new ClassPathResource(fileName+".xlsx");
+            InputStream inputStream = resource.getInputStream();
+            return new XSSFWorkbook(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Converts any cell type to a string representation.
      */
     private String getCellValueAsString(Cell cell) {
+        if (cell == null) return "";
+
         switch (cell.getCellType()) {
             case STRING:
                 return cell.getStringCellValue();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue().toString();
-                } else {
-                    // Convert to string but remove .0 for whole numbers
-                    double value = cell.getNumericCellValue();
-                    if (value == Math.floor(value)) {
-                        return String.valueOf((int)value);
-                    }
-                    return String.valueOf(value);
                 }
+                double value = cell.getNumericCellValue();
+                return (value == Math.floor(value)) ? String.valueOf((int) value) : String.valueOf(value);
             case BOOLEAN:
                 return String.valueOf(cell.getBooleanCellValue());
             case FORMULA:
                 try {
-                    return String.valueOf(cell.getStringCellValue());
-                } catch (Exception e) {
+                    return cell.getStringCellValue();
+                } catch (Exception e1) {
                     try {
                         return String.valueOf(cell.getNumericCellValue());
                     } catch (Exception e2) {
@@ -254,5 +147,4 @@ public class ExcelService {
                 return "";
         }
     }
-
 }
