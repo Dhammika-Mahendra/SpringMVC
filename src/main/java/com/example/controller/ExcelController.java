@@ -30,4 +30,23 @@ public class ExcelController {
         System.out.println("Cell value: " + cellValue);
         return "hello";
     }
+
+    // Generic version that can be used for any column lookup
+    @GetMapping("/exin")
+    @ResponseBody
+    public String lookupValue(
+            @RequestParam (name="inputColumn") String inputColumn,
+            @RequestParam (name="inputValue") String inputValue,
+            @RequestParam (name="outputColumn") String outputColumn,
+            @RequestParam (name="headInd") int headInd) {
+        System.out.println(inputColumn+ " " + inputValue + " " + outputColumn + " " + headInd);
+        String result = excelService.findValueByColumnMatch(inputColumn, headInd, inputValue, outputColumn);
+        if (result != null) {
+            System.out.println("Found " + outputColumn + ": " + result + " for " + inputColumn + ": " + inputValue);
+            return "hello";
+        } else {
+            System.out.println("Could not find " + outputColumn + " for " + inputColumn + ": " + inputValue);
+            return "hello";
+        }
+    }
 }
