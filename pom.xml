@@ -9,42 +9,93 @@
 
   <dependencies>
 
-    <!-- Main spring framework -->
+    <!-- Spring Framework -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
       <version>6.1.14</version>
     </dependency>
 
-    <!-- Servlet API -->
+    <!-- Jakarta Servlet API (not javax) -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>4.0.1</version>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>6.0.0</version>
       <scope>provided</scope>
     </dependency>
+    <!-- Jakarta JSTL  -->
+    <dependency>
+      <groupId>jakarta.servlet.jsp.jstl</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.web</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+      <version>3.0.1</version>
+    </dependency>
 
-    <!-- JDBC -->
+    <!-- ======================   Database handling ===================================== -->
+    <!-- Spring JDBC -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
       <version>6.1.14</version>
     </dependency>
-
-    <!-- installed .jar -->
-    <!-- mvn install:install-file -Dfile=src/main/resources/lib/ojdbc11.jar -DgroupId=com.oracle.database.jdbc -DartifactId=ojdbc11 -Dversion=21.9.0 -Dpackaging=jar -->
+    <!-- Oracle JDBC Driver -->
     <dependency>
       <groupId>com.oracle.database.jdbc</groupId>
       <artifactId>ojdbc11</artifactId>
       <version>21.9.0</version>
-      <scope>compile</scope>
+    </dependency>
+    <!-- Jakarta Persistence API -->
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+    <!-- Hibernate  -->
+    <dependency>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <version>6.4.4.Final</version>
+    </dependency>
+    <!-- Jakarta Bean Validation -->
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <version>3.0.2</version>
+    </dependency>
+    <!-- Spring ORM -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-orm</artifactId>
+      <version>6.1.14</version>
     </dependency>
 
-    <!-- JSTL for tagging -->
+    <!-- ======================   File handling ===================================== -->
+    <!-- Apache POI for Excel handling -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jstl</artifactId>
-      <version>1.2</version>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>5.2.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>5.2.3</version>
+    </dependency>
+
+    <!-- for apache poi vulnerability issues -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.14.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.26.0</version>
     </dependency>
 
   </dependencies>
