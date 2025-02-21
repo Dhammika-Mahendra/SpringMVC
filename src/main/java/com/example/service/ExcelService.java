@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 
 @Service
 public class ExcelService {
@@ -22,7 +24,7 @@ public class ExcelService {
 
             for (Row row : sheet) {
                 for (Cell cell : row) {
-                    System.out.print(getCellValueAsString(cell) + "\t");
+                    System.out.print(getCellValueAsString(cell) + "| \t");
                 }
                 System.out.println();
             }
@@ -88,6 +90,7 @@ public class ExcelService {
                 if (dataRow == null) continue;
 
                 Cell inputCell = dataRow.getCell(inputColumnIndex);
+                System.out.println(getCellValueAsString(inputCell)+"--->"+inputValue);
                 if (inputCell != null && getCellValueAsString(inputCell).equals(inputValue)) {
                     Cell outputCell = dataRow.getCell(outputColumnIndex);
                     return outputCell != null ? getCellValueAsString(outputCell) : null;
@@ -120,31 +123,66 @@ public class ExcelService {
      * Converts any cell type to a string representation.
      */
     private String getCellValueAsString(Cell cell) {
-        if (cell == null) return "";
+        if (cell == null) {
+            return "";
+        }
+
+        // Use DataFormatter for consistent String representation
+        DataFormatter formatter = new DataFormatter(true);
 
         switch (cell.getCellType()) {
             case STRING:
                 return cell.getStringCellValue();
+
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getDateCellValue().toString();
+                    // For dates, use SimpleDateFormat to ensure consistent output
+                    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                    return sdf.format(cell.getDateCellValue());
+                } else {
+                    // For numeric values, preserve exact representation using BigDecimal
+                    // This prevents scientific notation and maintains precision
+                    BigDecimal bd = BigDecimal.valueOf(cell.getNumericCellValue());
+                    return bd.toPlainString();
                 }
-                double value = cell.getNumericCellValue();
-                return (value == Math.floor(value)) ? String.valueOf((int) value) : String.valueOf(value);
+
             case BOOLEAN:
                 return String.valueOf(cell.getBooleanCellValue());
+
             case FORMULA:
+                // First try to evaluate the formula
                 try {
-                    return cell.getStringCellValue();
-                } catch (Exception e1) {
-                    try {
-                        return String.valueOf(cell.getNumericCellValue());
-                    } catch (Exception e2) {
-                        return "#FORMULA_ERROR#";
+                    FormulaEvaluator evaluator = cell.getSheet().getWorkbook()
+                            .getCreationHelper().createFormulaEvaluator();
+                    CellValue cellValue = evaluator.evaluate(cell);
+
+                    switch (cellValue.getCellType()) {
+                        case STRING:
+                            return cellValue.getStringValue();
+                        case NUMERIC:
+                            if (DateUtil.isCellDateFormatted(cell)) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                                return sdf.format(DateUtil.getJavaDate(cellValue.getNumberValue()));
+                            } else {
+                                BigDecimal bd = BigDecimal.valueOf(cellValue.getNumberValue());
+                                return bd.toPlainString();
+                            }
+                        case BOOLEAN:
+                            return String.valueOf(cellValue.getBooleanValue());
+                        default:
+                            return formatter.formatCellValue(cell, evaluator);
                     }
+                } catch (Exception e) {
+                    // Fall back to getting the formula string
+                    return cell.getCellFormula();
                 }
-            default:
+
+            case BLANK:
                 return "";
+
+            default:
+                // For any other types, use the DataFormatter as fallback
+                return formatter.formatCellValue(cell);
         }
     }
 }

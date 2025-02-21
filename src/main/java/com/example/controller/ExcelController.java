@@ -41,7 +41,7 @@ public class ExcelController {
             @RequestParam (name="outputColumn") String outputColumn,
             @RequestParam (name="headInd") int headInd,
             @RequestParam (name="fileName") String fileName) {
-        System.out.println(inputColumn+ " " + inputValue + " " + outputColumn + " " + headInd);
+        System.out.println(inputColumn+ " | " + inputValue + " | " + outputColumn + " | " + headInd);
         String result = excelService.findValueByColumnMatch(fileName, inputColumn, headInd, inputValue, outputColumn);
         if (result != null) {
             System.out.println("Found " + outputColumn + ": " + result + " for " + inputColumn + ": " + inputValue);
