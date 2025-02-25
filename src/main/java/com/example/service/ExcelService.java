@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.model.Payment;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.ClassPathResource;
@@ -9,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ExcelService {
@@ -28,6 +31,57 @@ public class ExcelService {
                 }
                 System.out.println();
             }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void readExcelTable(String fileName, int startRowIndex) {
+        try (Workbook workbook = getWorkbook(fileName)) {
+            if (workbook == null) return;
+
+            Sheet sheet = workbook.getSheetAt(0);
+
+            for (int rowIndex = startRowIndex; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                if (row == null) continue;
+
+                for (Cell cell : row) {
+                    System.out.print(getCellValueAsString(cell) + "| \t");
+                }
+                System.out.println();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void readExcelTableToModel(String fileName, int startRowIndex) {
+        try (Workbook workbook = getWorkbook(fileName)) {
+            List<Payment> paymentList = new ArrayList<>();
+
+            if (workbook == null) return;
+
+            Sheet sheet = workbook.getSheetAt(0);
+
+            for (int rowIndex = startRowIndex; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                if (row == null) continue;
+
+                Payment py = new Payment();
+                py.setPaymentId((long) row.getCell(0).getNumericCellValue());
+                py.setAmount(BigDecimal.valueOf(row.getCell(1).getNumericCellValue()));
+                py.setPaymentDate(row.getCell(2).getDateCellValue());
+                py.setPaymentMethod(Payment.PaymentMethod.valueOf(row.getCell(3).getStringCellValue()));
+                py.setStatus(Payment.PaymentStatus.valueOf(row.getCell(4).getStringCellValue()));
+
+                paymentList.add(py);
+            }
+
+            // Print or process the paymentList as needed
+            paymentList.forEach(System.out::println);
 
         } catch (IOException e) {
             e.printStackTrace();

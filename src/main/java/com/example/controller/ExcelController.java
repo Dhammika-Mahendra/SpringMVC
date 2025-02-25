@@ -20,6 +20,14 @@ public class ExcelController {
         return "hello";
     }
 
+    @GetMapping("/extb")
+    @ResponseBody
+    public String readExcelTable(@RequestParam (name="fileName") String fileName, @RequestParam (name="headInd") int headInd) {
+        excelService.readExcelTableToModel(fileName,headInd);
+        return "hello";
+    }
+
+
     @GetMapping("/exind")
     @ResponseBody
     public String readSpecificCell(
