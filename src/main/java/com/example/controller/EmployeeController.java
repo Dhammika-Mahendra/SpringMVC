@@ -1,43 +1,27 @@
 package com.example.controller;
 
-import com.example.util.DBUtil;
-import com.example.util.UserDao;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.model.Employee;
+import com.example.repository.EmployeeRepository;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.Set;
-import java.util.Map;
+import java.util.List;
 
 @Controller
 public class EmployeeController {
+    private final EmployeeRepository employeeRepository;
 
-    @Autowired
-    private DBUtil DBUtil;
+    public EmployeeController(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
 
-    @Autowired
-    private UserDao userDao;
-
-    @GetMapping("/dbcheck")
-    public String checkDatabaseConnection() {
-        userDao.testConnection();
+    @GetMapping("/db")
+    public String printEmployeeDetails(){
+       List<Employee> employees = employeeRepository.findAll();
+         for(Employee employee : employees){
+              System.out.println("Emp : "+ employee.getName());
+         }
         return "hello";
     }
 
-    @GetMapping("/employees")
-    public String getEmployeeData(Model model) {
-        // Call the utility class to get employee data from DB
-        Set<Map<String, Object>> employeeData = DBUtil.getEmployeeData();
-        model.addAttribute("employeeData", employeeData);
-        model.addAttribute("message", "Employee data fetched successfully!");
-        return "employee"; // Return to a view (you can display any message or data in the view)
-    }
-
-    @GetMapping("/empList")
-    public String getEmployees(Model model) {
-        Set<Map<String, Object>> employeeData = DBUtil.getEmployeeData();
-        model.addAttribute("employees", employeeData);
-        return "empLoop/empContainer";
-    }
 }

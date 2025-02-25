@@ -39,12 +39,23 @@
         <property name="proxyInterface" value="javax.sql.DataSource"/>
     </bean>
 
-    <!-- Transaction Manager -->
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource" />
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="persistenceUnitName" value="empPU"/>
+        <property name="packagesToScan" value="com.example.model"/>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        </property>
     </bean>
 
-    <tx:annotation-driven transaction-manager="transactionManager" />
+    <!-- Transaction Manager -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <!-- Enable Transaction annotations -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <property name="dataSource" ref="dataSource" />
