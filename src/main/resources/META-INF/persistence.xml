@@ -5,13 +5,13 @@
              version="3.0">
 
     <persistence-unit name="empPU">
-      <non-jta-data-source>java:jboss/datasources/newUserDatasource</non-jta-data-source>
-      <class>com.example.model.Employee</class>
-      <properties>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <jta-data-source>java:jboss/datasources/newUserDatasource</jta-data-source>
+        <class>com.example.model.Employee</class>
+        <properties>
         <property name="hibernate.dialect" value="org.hibernate.dialect.OracleDialect"/>
         <property name="hibernate.show_sql" value="true"/>
         <property name="hibernate.format_sql" value="true"/>
-        <property name="hibernate.default_schema" value="DHAMMIKA"/>
       </properties>
     </persistence-unit>
 </persistence>

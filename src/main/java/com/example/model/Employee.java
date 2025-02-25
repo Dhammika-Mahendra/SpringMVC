@@ -1,13 +1,16 @@
 package com.example.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "EMPLOYEES")
+@Getter
+@Setter
+@Table(name = "EMPLOYEES" , schema = "DHAMMIKA")
 public class Employee {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EMPID")
     private int id;
 
@@ -23,5 +26,5 @@ public class Employee {
     @Column(name = "EMPPLACE")
     private String place;
 
-    // Getters and Setters
 }
+

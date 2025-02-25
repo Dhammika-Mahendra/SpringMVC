@@ -8,12 +8,11 @@
   <packaging>war</packaging>
 
   <properties>
-    <java.version>17</java.version>
+    <java.version>21</java.version>
     <spring.version>6.1.14</spring.version>
     <hibernate.version>6.4.4.Final</hibernate.version>
     <jakarta.servlet.version>6.0.0</jakarta.servlet.version>
     <jakarta.jstl.version>3.0.0</jakarta.jstl.version>
-    <jackson.version>2.15.3</jackson.version>
     <poi.version>5.2.3</poi.version>
     <commons.io.version>2.14.0</commons.io.version>
     <commons.compress.version>1.26.0</commons.compress.version>
@@ -26,26 +25,15 @@
       <artifactId>spring-webmvc</artifactId>
       <version>${spring.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jdbc</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-orm</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
 
-    <!-- Jakarta Servlet API -->
+    <!--====================== Servlet =================================================== -->
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
       <version>${jakarta.servlet.version}</version>
       <scope>provided</scope>
     </dependency>
-
-    <!-- Jakarta JSTL -->
+    <!-- jstl tags -->
     <dependency>
       <groupId>jakarta.servlet.jsp.jstl</groupId>
       <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
@@ -57,12 +45,7 @@
       <version>3.0.1</version>
     </dependency>
 
-    <!-- Database handling -->
-    <dependency>
-      <groupId>com.oracle.database.jdbc</groupId>
-      <artifactId>ojdbc11</artifactId>
-      <version>21.9.0</version>
-    </dependency>
+    <!-- =====================    Database handling ========================================= -->
     <dependency>
       <groupId>jakarta.persistence</groupId>
       <artifactId>jakarta.persistence-api</artifactId>
@@ -73,8 +56,23 @@
       <artifactId>hibernate-core</artifactId>
       <version>${hibernate.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-orm</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
 
-    <!-- Validation -->
+
+    <!-- model handling -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.34</version>
+      <scope>compile</scope>
+    </dependency>
+
+
+    <!-- Validation (extra needed for JPA) -->
     <dependency>
       <groupId>jakarta.validation</groupId>
       <artifactId>jakarta.validation-api</artifactId>
@@ -86,7 +84,7 @@
       <version>8.0.1.Final</version>
     </dependency>
 
-    <!-- File handling -->
+    <!-- ==========================  File handling ====================================== -->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
@@ -108,19 +106,7 @@
       <version>${commons.compress.version}</version>
     </dependency>
 
-    <!-- JSON handling -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
   </dependencies>
-
   <build>
     <finalName>SpringMVC</finalName>
     <plugins>
