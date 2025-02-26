@@ -1,8 +1,10 @@
 package com.example.service;
 
 import com.example.model.Payment;
+import com.example.repository.PaymentRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,13 @@ import java.util.List;
 
 @Service
 public class ExcelService {
+
+    @Autowired
+    private final PaymentRepository paymentRepository;
+
+    public ExcelService(PaymentRepository paymentRepository) {
+        this.paymentRepository = paymentRepository;
+    }
 
     /**
      * Reads the entire content of an Excel file and prints it to the console.
@@ -71,7 +80,7 @@ public class ExcelService {
                 if (row == null) continue;
 
                 Payment py = new Payment();
-                py.setPaymentId((long) row.getCell(0).getNumericCellValue());
+                //py.setPaymentId((long) row.getCell(0).getNumericCellValue());
                 py.setAmount(BigDecimal.valueOf(row.getCell(1).getNumericCellValue()));
                 py.setPaymentDate(row.getCell(2).getDateCellValue());
                 py.setPaymentMethod(Payment.PaymentMethod.valueOf(row.getCell(3).getStringCellValue()));
@@ -82,6 +91,13 @@ public class ExcelService {
 
             // Print or process the paymentList as needed
             paymentList.forEach(System.out::println);
+
+            if(paymentRepository.createPaymentSet(paymentList)){
+                System.out.println("Payment List created successfully");
+            }else{
+                System.out.println("Payment List creation failed");
+            }
+
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -54,6 +54,23 @@ public class PaymentRepository {
     }
 
     @Transactional
+    public boolean createPaymentSet(List<Payment> payment) {
+        try {
+            for (Payment p : payment) {
+                entityManager.persist(p);
+            }
+            entityManager.flush();
+            return true;
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid payment data: {}", payment, e);
+            return false;
+        } catch (DataAccessException e) {
+            logger.error("Database error while creating payment: {}", payment, e);
+            return false;
+        }
+    }
+
+    @Transactional
     public boolean updatePayment(Payment payment) {
         try {
             if (payment.getPaymentId()== null) {
