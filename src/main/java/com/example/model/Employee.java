@@ -12,7 +12,7 @@ public class Employee {
 
     @Id
     @Column(name = "EMPID")
-    private int id;
+    private Long id;
 
     @Column(name = "EMPNAME")
     private String name;
