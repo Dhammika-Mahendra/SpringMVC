@@ -9,6 +9,7 @@
         <jta-data-source>java:jboss/datasources/newUserDatasource</jta-data-source>
         <class>com.example.model.Employee</class>
         <class>com.example.model.Payment</class>
+        <class>com.example.model.Sample</class>
         <properties>
         <property name="hibernate.dialect" value="org.hibernate.dialect.OracleDialect"/>
         <property name="hibernate.show_sql" value="true"/>
