@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.model.BaseTableModel;
+import com.example.repository.ExcelRepository;
 import com.example.service.Excel.ExcelProcessor;
 import com.example.service.ExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,10 @@ public class ExcelController {
 
     @Autowired
     private ExcelService excelService;
+
+    @Autowired
+    private ExcelRepository excelRepository;
+
 
     @GetMapping("/ex")
     @ResponseBody
@@ -35,10 +40,11 @@ public class ExcelController {
     @ResponseBody
     public String readExcelTable2(
             @RequestParam (name="fileName") String fileName,
-            @RequestParam (name="headInd") int headInd,
+            @RequestParam (name="startRowIndex") int startRowIndex,
             @RequestParam (name="tableType") String tableType
             ) {
-        List<BaseTableModel> records = ExcelProcessor.readExcelTableToModel(fileName, headInd, tableType);
+        List<BaseTableModel> records = ExcelProcessor.readExcelTableToModel(fileName, startRowIndex, tableType);
+        //excelRepository.fetchData(records);
         return "hello";
     }
 

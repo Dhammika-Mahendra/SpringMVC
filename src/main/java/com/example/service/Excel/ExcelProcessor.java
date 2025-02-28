@@ -3,8 +3,9 @@ package com.example.service.Excel;
 import com.example.model.BaseTableModel;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.core.io.ClassPathResource;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -12,30 +13,46 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.lang.reflect.*;
+import java.util.Properties;
 
 public class ExcelProcessor {
 
+    //fetch file path from properties file
+    private static String excelFilePath;
+    static {
+        try (InputStream input = ExcelProcessor.class.getClassLoader().getResourceAsStream("endpoint.properties")) {
+            Properties prop = new Properties();
+            if (input != null) {
+                prop.load(input);
+                excelFilePath = prop.getProperty("excel.path");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     //content of an Excel file returned as a list of model instances
     public static <T extends BaseTableModel> List<T> readExcelTableToModel(String fileName, int startRowIndex, String tableType) {
+
+        Class<T> modelClass = (Class<T>) ModelFactory.getModelClass(tableType);
+
+        if (modelClass == null) {
+            throw new IllegalArgumentException("Invalid table type: " + tableType);
+        }
+
         List<T> dataList = new ArrayList<>();
 
         try (Workbook workbook = getWorkbook(fileName)) {
-            if (workbook == null) return dataList;
 
             Sheet sheet = workbook.getSheetAt(0);
-            Class<T> modelClass = (Class<T>) ModelFactory.getModelClass(tableType);
-
-            if (modelClass == null) {
-                throw new IllegalArgumentException("Invalid table type: " + tableType);
-            }
 
             // Get column mappings for the given table type
             Map<Integer, String> columnMappings = ColumnMapper.getColumnMappings(tableType);
 
             for (int rowIndex = startRowIndex; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+
                 Row row = sheet.getRow(rowIndex);
                 if (row == null) continue;
-
                 T modelInstance = modelClass.getDeclaredConstructor().newInstance();
 
                 for (Map.Entry<Integer, String> entry : columnMappings.entrySet()) {
@@ -45,7 +62,13 @@ public class ExcelProcessor {
                     Cell cell = row.getCell(columnIndex);
                     if (cell == null) continue;
 
-                    setFieldValue(modelInstance, fieldName, cell);
+                    //reading the value of a single cell
+                    try {
+                        setFieldValue(modelInstance, fieldName, cell);
+                    } catch (Exception e) {
+                        System.err.println("Error :" + e.getMessage());
+                        System.err.println("Error reading value for field: " + fieldName + " at row: " + (rowIndex + 1) + ", column: " + (columnIndex + 1));
+                    }
                 }
 
                 dataList.add(modelInstance);
@@ -115,13 +138,19 @@ public class ExcelProcessor {
             }
         }
     }
-
-    //workbook opening
+    
+//workbook opening
     private static Workbook getWorkbook(String fileName) {
+
         try {
-            ClassPathResource resource = new ClassPathResource(fileName+".xlsx");
-            InputStream inputStream = resource.getInputStream();
-            return new XSSFWorkbook(inputStream);
+            System.out.println("URL: " + excelFilePath);
+            File file = new File(excelFilePath+fileName+".xlsx");
+            if (!file.exists()) {
+                throw new IOException("File not found: " + fileName);
+            }
+            try (FileInputStream inputStream = new FileInputStream(file)) {
+                return new XSSFWorkbook(inputStream);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return null;
