@@ -1,5 +1,9 @@
 package com.example.controller;
 
+import com.example.model.BaseTableModel;
+import com.example.repository.ExcelRepository;
+import com.example.service.Excel.ExcelProcessor;
+import com.example.service.Excel.ExcelProcessorDir;
 import com.example.service.ExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -7,11 +11,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
+
 @Controller
 public class ExcelController {
 
     @Autowired
     private ExcelService excelService;
+
+    @Autowired
+    private ExcelRepository excelRepository;
+
 
     @GetMapping("/ex")
     @ResponseBody
@@ -26,7 +36,6 @@ public class ExcelController {
         excelService.readExcelTableToModel(fileName,headInd);
         return "hello";
     }
-
 
     @GetMapping("/exind")
     @ResponseBody
@@ -58,5 +67,34 @@ public class ExcelController {
             System.out.println("Could not find " + outputColumn + " for " + inputColumn + ": " + inputValue);
             return "hello";
         }
+    }
+
+    //------------------------------------------------------------------------------------------
+    //                  Excel to DB
+    //-----------------------------------------------------------------------------------------
+
+    //Read single Excel file and fetch to database
+    @GetMapping("/exdb")
+    @ResponseBody
+    public String readExcelToDB(
+            @RequestParam (name="fileName") String fileName,
+            @RequestParam (name="startRowIndex") int startRowIndex,
+            @RequestParam (name="tableType") String tableType
+    ) {
+        List<BaseTableModel> records = ExcelProcessor.readExcelTableToModel(fileName, startRowIndex, tableType);
+        return "hello";
+    }
+
+    //Read multiple Excel file and fetch to database
+    @GetMapping("/exdbdir")
+    @ResponseBody
+    public String readExcelToDBDir(
+            @RequestParam (name="dirName") String dirName,
+            @RequestParam (name="startRowIndex") int startRowIndex,
+            @RequestParam (name="tableType") String tableType
+    ) {
+        List<BaseTableModel> records = ExcelProcessorDir.readExcelTableToModel(dirName, startRowIndex, tableType);
+        excelRepository.fetchData(records);
+        return "hello";
     }
 }

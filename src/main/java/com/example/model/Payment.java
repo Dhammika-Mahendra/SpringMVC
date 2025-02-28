@@ -11,7 +11,7 @@ import java.util.Date;
 @Setter
 @Entity
 @Table(name = "PAYMENTS", schema = "DHAMMIKA")
-public class Payment {
+public class Payment implements BaseTableModel {
 
     // Getters and setters
     @Id
